@@ -7,22 +7,189 @@
 //Fonctions à implémenter:
 
 // Fonction de permutation (IP)
+
+int S0[4][4] = {{1,0,3,2},{3,2,1,0},{0,2,1,3},{3,1,3,2}};
+int S1[4][4] = {{0,1,2,3},{2,0,1,3},{3,0,1,0},{2,1,0,3}};
+  
+std::bitset<4> get_partie_droite(std::bitset<8> octet)
+{
+  std::bitset<4> demiOctet;
+  demiOctet[0] = octet[0];
+  demiOctet[1] = octet[1];
+  demiOctet[2] = octet[2];
+  demiOctet[3] = octet[3];
+  return demiOctet;
+}
+
+
+std::bitset<4> get_partie_gauche(std::bitset<8> octet)
+{
+  std::bitset<4> demiOctet;
+  demiOctet[0] = octet[4];
+  demiOctet[1] = octet[5];
+  demiOctet[2] = octet[6];
+  demiOctet[3] = octet[7];
+  return demiOctet;
+}
+
+
+
+std::bitset<10> permutation_p10(std::bitset<10> octet)
+{
+  std::bitset<10>  octetTempo;
+  octetTempo[9] =  octet[7];
+  octetTempo[8] =  octet[5];
+  octetTempo[7] =  octet[8];
+  octetTempo[6] =  octet[3];
+  octetTempo[5] =  octet[6];
+  octetTempo[4] =  octet[0];
+  octetTempo[3] =  octet[9];
+  octetTempo[2] =  octet[1];
+  octetTempo[1] =  octet[2];
+  octetTempo[0] =  octet[4];
+
+  return  octetTempo;  
+}
+
+std::bitset<5> permutation_a_gauche(std::bitset<5> bits)
+{
+  std::bitset<1> tmp;
+  tmp[0] = bits[bits.size()-1];
+  bits <<= 1;
+  bits[0] = tmp[0]; 
+  return bits;
+}
+
+std::bitset<8>permutation_p8(std::bitset<10> octet)
+{
+  std::bitset<8>  octetTempo;
+
+  octetTempo[7] =  octet[4];
+  octetTempo[6] =  octet[7];
+  octetTempo[5] =  octet[3];
+  octetTempo[4] =  octet[6];
+  octetTempo[3] =  octet[2];
+  octetTempo[2] =  octet[5];
+  octetTempo[1] =  octet[0];
+  octetTempo[0] =  octet[1];
+  return  octetTempo;  
+}
+
+std::bitset<4>permutation_p4(std::bitset<4> bits)
+{
+  std::bitset<4>  bitsTempo;
+
+  bitsTempo[3] =  bits[2];
+  bitsTempo[2] =  bits[0];
+  bitsTempo[1] =  bits[1];
+  bitsTempo[0] =  bits[3];
+  return  bitsTempo;  
+}
+
+std::bitset<8> generation_k1(std::bitset<10> cle)
+{
+  std::bitset<10> clePermutee = permutation_p10(cle);
+  std::bitset<5> clePartieDroite;
+  std::bitset<5> clePartieGauche;
+
+ 
+  std::cout << clePermutee << std::endl;
+
+  clePartieDroite[0] = clePermutee[0];
+  clePartieDroite[1] = clePermutee[1];
+  clePartieDroite[2] = clePermutee[2];
+  clePartieDroite[3] = clePermutee[3];
+  clePartieDroite[4] = clePermutee[4];
+  clePartieGauche[0] = clePermutee[5];
+  clePartieGauche[1] = clePermutee[6];
+  clePartieGauche[2] = clePermutee[7];
+  clePartieGauche[3] = clePermutee[8];
+  clePartieGauche[4] = clePermutee[9];
+
+
+  clePartieGauche = permutation_a_gauche(clePartieGauche);
+  clePartieDroite = permutation_a_gauche(clePartieDroite);
+  
+
+  cle[9] = clePartieGauche[4];
+  cle[8] = clePartieGauche[3];
+  cle[7] = clePartieGauche[2];
+  cle[6] = clePartieGauche[1];
+  cle[5] = clePartieGauche[0];
+  cle[4] = clePartieDroite[4];
+  cle[3] = clePartieDroite[3];
+  cle[2] = clePartieDroite[2];
+  cle[1] = clePartieDroite[1];
+  cle[0] = clePartieDroite[0];
+
+  return permutation_p8(cle);  
+}
+
+
+std::bitset<8> generation_k2(std::bitset<10> cle)
+{
+  std::bitset<10> clePermutee = permutation_p10(cle);
+  std::bitset<5> clePartieDroite;
+  std::bitset<5> clePartieGauche;
+
+
+  clePartieDroite[0] = clePermutee[0];
+  clePartieDroite[1] = clePermutee[1];
+  clePartieDroite[2] = clePermutee[2];
+  clePartieDroite[3] = clePermutee[3];
+  clePartieDroite[4] = clePermutee[4];
+  clePartieGauche[0] = clePermutee[5];
+  clePartieGauche[1] = clePermutee[6];
+  clePartieGauche[2] = clePermutee[7];
+  clePartieGauche[3] = clePermutee[8];
+  clePartieGauche[4] = clePermutee[9];
+
+
+  clePartieGauche = permutation_a_gauche(clePartieGauche);
+  clePartieDroite = permutation_a_gauche(clePartieDroite);
+
+  clePartieGauche = permutation_a_gauche(clePartieGauche);
+  clePartieDroite = permutation_a_gauche(clePartieDroite);
+
+  clePartieGauche = permutation_a_gauche(clePartieGauche);
+  clePartieDroite = permutation_a_gauche(clePartieDroite);
+  
+
+  cle[9] = clePartieGauche[4];
+  cle[8] = clePartieGauche[3];
+  cle[7] = clePartieGauche[2];
+  cle[6] = clePartieGauche[1];
+  cle[5] = clePartieGauche[0];
+  cle[4] = clePartieDroite[4];
+  cle[3] = clePartieDroite[3];
+  cle[2] = clePartieDroite[2];
+  cle[1] = clePartieDroite[1];
+  cle[0] = clePartieDroite[0];
+
+  return permutation_p8(cle);  
+}
+
+char conversion_bit_to_char(std::bitset<8> octet)
+{
+  return  char(octet.to_ulong()); 
+}
+
+std::bitset<8> conversion_char_to_bits(unsigned char byte)
+{
+  return std::bitset<8>(byte);
+}
+
 std::bitset<8> permutation_ip(std::bitset<8> octet)
 {
   std::bitset<8>  octetTempo;
-  std::cout << "octet à tester:" << octet << std::endl;
-  // std::cout << ":" << octet[0] << std::endl;
-  // std::cout << ":" << octet[1] << std::endl;
-  for(int i = 0; i < octet.size(); i++)
-    std::cout << octet[i] << std::endl;
-  octetTempo[0] =  octet[1];
-  octetTempo[1] =  octet[5];
-  octetTempo[2] =  octet[2];
-  octetTempo[3] =  octet[0];
-  octetTempo[4] =  octet[3];
-  octetTempo[5] =  octet[7];
-  octetTempo[6] =  octet[4];
   octetTempo[7] =  octet[6];
+  octetTempo[6] =  octet[2];
+  octetTempo[5] =  octet[5];
+  octetTempo[4] =  octet[7];
+  octetTempo[3] =  octet[4];
+  octetTempo[2] =  octet[0];
+  octetTempo[1] =  octet[3];
+  octetTempo[0] =  octet[1];
   return  octetTempo;
 }
 
@@ -40,26 +207,138 @@ std::bitset<8> permutation_ip_moinsun(std::bitset<8> octet)
   octetTempo[7] =  octet[5];
   return  octetTempo;
 }
-// Fonction de génération des deux sous-clés
+
 
 // Fonction de permutation des 4 bits (SW)
+std::bitset<8> permutation_sw(std::bitset<8> octet)
+{
+  std::bitset<8> newOctet;
+  std::bitset<4> partieDroite = get_partie_droite(octet);
+  std::bitset<4> partieGauche = get_partie_gauche(octet);
+
+  std::cout << "SW: PARTIE DROITE: " << partieDroite << std::endl;
+  std::cout << "SW: PARTIE GAUCHE " << partieGauche << std::endl;
+
+  newOctet[0] =  partieGauche[0];
+  newOctet[1] =  partieGauche[1];
+  newOctet[2] =  partieGauche[2];
+  newOctet[3] =  partieGauche[3];
+  newOctet[4] =  partieDroite[0];
+  newOctet[5] =  partieDroite[1];
+  newOctet[6] =  partieDroite[2];
+  newOctet[7] =  partieDroite[3];
+
+  return newOctet;
+    
+}
 
 // La fonction fk
+
+
+std::bitset<4> fonction_fk(std::bitset<4> demiIP, std::bitset<4> bitsP4)
+{
+  return demiIP ^= bitsP4;
+}
+
+
+
+
+
+std::bitset<8> calcul_ep(std::bitset<4> demiOctet)
+ {
+   std::bitset<8> ep;
+   ep[7] =  demiOctet[0];
+   ep[6] =  demiOctet[3];
+   ep[5] =  demiOctet[2];
+   ep[4] =  demiOctet[1];
+   ep[3] =  demiOctet[2];
+   ep[2] =  demiOctet[1];
+   ep[1] =  demiOctet[0];
+   ep[0] =  demiOctet[3];
+   return ep;
+ }
+
+std::bitset<4> traitement_matrices(std::bitset<8> resultatXOR)
+{
+  std::bitset<4> sortieSbox;
+
+ int ligneS0 = resultatXOR[7]*2 + resultatXOR[4];
+ int colonneS0 = resultatXOR[6]*2 + resultatXOR[5];
+ int ligneS1 = resultatXOR[3]*2 + resultatXOR[0];
+ int colonneS1 = resultatXOR[2]*2 + resultatXOR[1];
+
+ int valeurS0 = S0[colonneS0][ligneS0];
+ int valeurS1 = S1[colonneS1][ligneS1];
+
+ if( valeurS0 >= 2)
+   sortieSbox[3]=1;
+ else  sortieSbox[3]=0;
+ if(valeurS0 -2 > 0)
+   sortieSbox[2]=1;
+  else  sortieSbox[2]=0;
+  if( valeurS1 >= 2)
+   sortieSbox[1]=1;
+   else  sortieSbox[1]=0;
+ if(valeurS1 -2 > 0)
+   sortieSbox[0]=1;
+  else  sortieSbox[0]=0;
+
+ return permutation_p4(sortieSbox);
+}
 
 int main(int argc, char ** argv)
 {
   // ici, ouverture et parcours de fichier.
   // Envoi vers les autres fonctions caractère par caractère
-  std::bitset<8> octet;
-  std::bitset<8> octet2 { 'A' }; 
-
-  std::cout << octet2 << std::endl;
-
-  octet = permutation_ip(octet2);
-    
-  std::cout << octet << std::endl;
 
 
+  std::bitset<10> cle = {0b1111011001};
+  std::bitset<8> clek1 = generation_k1(cle);
+  std::bitset<8> clek2 = generation_k2(cle);
+  
+  std::bitset<8> octet = conversion_char_to_bits('A');
+  std::bitset<8> octetIP = permutation_ip(octet);
+  std::cout << "octetIP " << octetIP << std::endl;
+  std::bitset<4> octetPartieDroite  = get_partie_droite(octetIP);
+
+  std::cout << "Partie droite : " << octetPartieDroite << std::endl; 
+  
+  std::bitset<8> ep = calcul_ep(octetPartieDroite);
+  std::bitset<8> resultatXOR = ep^=clek1; // On a p
+  std::bitset<4> sortieSbox = traitement_matrices(resultatXOR);
+  std::bitset<4> octetPartieGauche  = get_partie_gauche(octetIP);
+  std::bitset<4> resultatFK = fonction_fk(octetPartieGauche, sortieSbox);
+
+  octetIP = permutation_sw(octetIP);
+
+    std::cout << "octetIP swappé " << octetIP << std::endl;
+
+  std::cout << "Resultat FK premiere itération: " << resultatFK << std::endl;
+
+
+
+   octetPartieDroite  = get_partie_droite(octetIP);
+       std::cout << "Partie droite : " << octetPartieDroite << std::endl; 
+   ep = calcul_ep(octetPartieDroite);
+    std::cout << "EP : " << ep << std::endl;
+   resultatXOR = ep^=clek2; // On a p
+   std::cout << "p : " << resultatXOR << std::endl;
+   sortieSbox = traitement_matrices(resultatXOR);
+   std::cout << "Sortie SBOX 2 " << sortieSbox << std::endl;
+   octetPartieGauche  = get_partie_gauche(octetIP);
+   resultatFK = fonction_fk(octetPartieGauche, sortieSbox);
+   
+    std::cout << "Resultat FK deuxieme itération: " << resultatFK << std::endl;
+  //   std::bitset<8> octetTest = {0b11000000};
+  //   octetTest >>= 1;
+  //   std::cout << "Test: " << octetTest  << std::endl;
+
+
+   // std::bitset<8> clek1 = generation_k1(cleTest);
+   // std::cout << "K1:" << clek1 << std::endl;
+
+   //   std::bitset<8> clek2 = generation_k2(cleTest);
+   // std::cout << "K2:" << clek2 << std::endl;
   return 0;
   
 }
