@@ -4,9 +4,10 @@
 #include <fstream>
 #include <bitset>
 
-//Fonctions à implémenter:
+// Actuellement, le code me retourne bien 1111 pour la première partie du codage de A
+// Cependant la valeur est faussée dans la deuxième partie
+// S'il est possible d'avoir plus de temps, je terminerais volontiers !
 
-// Fonction de permutation (IP)
 
 int S0[4][4] = {{1,0,3,2},{3,2,1,0},{0,2,1,3},{3,1,3,2}};
 int S1[4][4] = {{0,1,2,3},{2,0,1,3},{3,0,1,0},{2,1,0,3}};
@@ -14,10 +15,12 @@ int S1[4][4] = {{0,1,2,3},{2,0,1,3},{3,0,1,0},{2,1,0,3}};
 std::bitset<4> get_partie_droite(std::bitset<8> octet)
 {
   std::bitset<4> demiOctet;
+  
   demiOctet[0] = octet[0];
   demiOctet[1] = octet[1];
   demiOctet[2] = octet[2];
   demiOctet[3] = octet[3];
+  
   return demiOctet;
 }
 
@@ -25,10 +28,12 @@ std::bitset<4> get_partie_droite(std::bitset<8> octet)
 std::bitset<4> get_partie_gauche(std::bitset<8> octet)
 {
   std::bitset<4> demiOctet;
+  
   demiOctet[0] = octet[4];
   demiOctet[1] = octet[5];
   demiOctet[2] = octet[6];
   demiOctet[3] = octet[7];
+  
   return demiOctet;
 }
 
@@ -72,6 +77,7 @@ std::bitset<8>permutation_p8(std::bitset<10> octet)
   octetTempo[2] =  octet[5];
   octetTempo[1] =  octet[0];
   octetTempo[0] =  octet[1];
+  
   return  octetTempo;  
 }
 
@@ -83,6 +89,7 @@ std::bitset<4>permutation_p4(std::bitset<4> bits)
   bitsTempo[2] =  bits[0];
   bitsTempo[1] =  bits[1];
   bitsTempo[0] =  bits[3];
+  
   return  bitsTempo;  
 }
 
@@ -91,9 +98,6 @@ std::bitset<8> generation_k1(std::bitset<10> cle)
   std::bitset<10> clePermutee = permutation_p10(cle);
   std::bitset<5> clePartieDroite;
   std::bitset<5> clePartieGauche;
-
- 
-  std::cout << clePermutee << std::endl;
 
   clePartieDroite[0] = clePermutee[0];
   clePartieDroite[1] = clePermutee[1];
@@ -106,11 +110,9 @@ std::bitset<8> generation_k1(std::bitset<10> cle)
   clePartieGauche[3] = clePermutee[8];
   clePartieGauche[4] = clePermutee[9];
 
-
   clePartieGauche = permutation_a_gauche(clePartieGauche);
   clePartieDroite = permutation_a_gauche(clePartieDroite);
   
-
   cle[9] = clePartieGauche[4];
   cle[8] = clePartieGauche[3];
   cle[7] = clePartieGauche[2];
@@ -209,15 +211,12 @@ std::bitset<8> permutation_ip_moinsun(std::bitset<8> octet)
 }
 
 
-// Fonction de permutation des 4 bits (SW)
+
 std::bitset<8> permutation_sw(std::bitset<8> octet)
 {
   std::bitset<8> newOctet;
   std::bitset<4> partieDroite = get_partie_droite(octet);
   std::bitset<4> partieGauche = get_partie_gauche(octet);
-
-  std::cout << "SW: PARTIE DROITE: " << partieDroite << std::endl;
-  std::cout << "SW: PARTIE GAUCHE " << partieGauche << std::endl;
 
   newOctet[0] =  partieGauche[0];
   newOctet[1] =  partieGauche[1];
@@ -228,21 +227,14 @@ std::bitset<8> permutation_sw(std::bitset<8> octet)
   newOctet[6] =  partieDroite[2];
   newOctet[7] =  partieDroite[3];
 
-  return newOctet;
-    
+  return newOctet;    
 }
-
-// La fonction fk
 
 
 std::bitset<4> fonction_fk(std::bitset<4> demiIP, std::bitset<4> bitsP4)
 {
   return demiIP ^= bitsP4;
 }
-
-
-
-
 
 std::bitset<8> calcul_ep(std::bitset<4> demiOctet)
  {
@@ -266,7 +258,6 @@ std::bitset<4> traitement_matrices(std::bitset<8> resultatXOR)
  int colonneS0 = resultatXOR[6]*2 + resultatXOR[5];
  int ligneS1 = resultatXOR[3]*2 + resultatXOR[0];
  int colonneS1 = resultatXOR[2]*2 + resultatXOR[1];
-
  int valeurS0 = S0[colonneS0][ligneS0];
  int valeurS1 = S1[colonneS1][ligneS1];
 
@@ -286,59 +277,52 @@ std::bitset<4> traitement_matrices(std::bitset<8> resultatXOR)
  return permutation_p4(sortieSbox);
 }
 
-int main(int argc, char ** argv)
+void cryptage_tpdes(char caractere,  std::bitset<10> cle)
 {
-  // ici, ouverture et parcours de fichier.
-  // Envoi vers les autres fonctions caractère par caractère
-
-
-  std::bitset<10> cle = {0b1111011001};
   std::bitset<8> clek1 = generation_k1(cle);
   std::bitset<8> clek2 = generation_k2(cle);
-  
-  std::bitset<8> octet = conversion_char_to_bits('A');
+  std::bitset<8> octet = conversion_char_to_bits(caractere);
   std::bitset<8> octetIP = permutation_ip(octet);
-  std::cout << "octetIP " << octetIP << std::endl;
   std::bitset<4> octetPartieDroite  = get_partie_droite(octetIP);
-
-  std::cout << "Partie droite : " << octetPartieDroite << std::endl; 
-  
   std::bitset<8> ep = calcul_ep(octetPartieDroite);
-  std::bitset<8> resultatXOR = ep^=clek1; // On a p
+  std::bitset<8> resultatXOR = ep^=clek1;
   std::bitset<4> sortieSbox = traitement_matrices(resultatXOR);
   std::bitset<4> octetPartieGauche  = get_partie_gauche(octetIP);
   std::bitset<4> resultatFK = fonction_fk(octetPartieGauche, sortieSbox);
 
   octetIP = permutation_sw(octetIP);
+  octetPartieDroite  = get_partie_droite(octetIP);
+  ep = calcul_ep(octetPartieDroite);
+  resultatXOR = ep^=clek2; 
+  sortieSbox = traitement_matrices(resultatXOR);
+  octetPartieGauche  = get_partie_gauche(octetIP);
+  resultatFK = fonction_fk(octetPartieGauche, sortieSbox);   
+}
 
-    std::cout << "octetIP swappé " << octetIP << std::endl;
-
-  std::cout << "Resultat FK premiere itération: " << resultatFK << std::endl;
-
-
-
-   octetPartieDroite  = get_partie_droite(octetIP);
-       std::cout << "Partie droite : " << octetPartieDroite << std::endl; 
-   ep = calcul_ep(octetPartieDroite);
-    std::cout << "EP : " << ep << std::endl;
-   resultatXOR = ep^=clek2; // On a p
-   std::cout << "p : " << resultatXOR << std::endl;
-   sortieSbox = traitement_matrices(resultatXOR);
-   std::cout << "Sortie SBOX 2 " << sortieSbox << std::endl;
-   octetPartieGauche  = get_partie_gauche(octetIP);
-   resultatFK = fonction_fk(octetPartieGauche, sortieSbox);
-   
-    std::cout << "Resultat FK deuxieme itération: " << resultatFK << std::endl;
-  //   std::bitset<8> octetTest = {0b11000000};
-  //   octetTest >>= 1;
-  //   std::cout << "Test: " << octetTest  << std::endl;
-
-
-   // std::bitset<8> clek1 = generation_k1(cleTest);
-   // std::cout << "K1:" << clek1 << std::endl;
-
-   //   std::bitset<8> clek2 = generation_k2(cleTest);
-   // std::cout << "K2:" << clek2 << std::endl;
-  return 0;
+int main(int argc, char ** argv)
+{
+  std::string maString;
+      
+  if (argc < 3)
+    {
+      std::cout << "Pas assez d'arguments, utilisez le format ./a.out <texte> <cle> <cle>" << std::endl;
+    }
+  else
+    {
+      std::ifstream fichier(argv[1], std::ios::in);
+      std::bitset<10> cle (argv[2]);
+      if(fichier)  
+	    {       
+	      while(getline(fichier, maString))  // Chiffrement du texte ligne par ligne. 
+		{
+		  for(int i = 0; i < maString.size(); i++)
+		    cryptage_tpdes(maString[i], cle);
+		}
+	      fichier.close(); 
+	    }
+	  else 
+	    std::cout << "Impossible d'ouvrir le fichier !" << std::endl;
+    }
   
+  return 0;  
 }
