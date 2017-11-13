@@ -6,7 +6,7 @@
 
 // Actuellement, le code me retourne bien 1111 pour la première partie du codage de A
 // Cependant la valeur est faussée dans la deuxième partie
-// S'il est possible d'avoir plus de temps, je terminerais volontiers !
+// Toutes les fonctions sont cependant implementées pour que le tout fonctionne. 
 
 
 int S0[4][4] = {{1,0,3,2},{3,2,1,0},{0,2,1,3},{3,1,3,2}};
@@ -237,44 +237,44 @@ std::bitset<4> fonction_fk(std::bitset<4> demiIP, std::bitset<4> bitsP4)
 }
 
 std::bitset<8> calcul_ep(std::bitset<4> demiOctet)
- {
-   std::bitset<8> ep;
-   ep[7] =  demiOctet[0];
-   ep[6] =  demiOctet[3];
-   ep[5] =  demiOctet[2];
-   ep[4] =  demiOctet[1];
-   ep[3] =  demiOctet[2];
-   ep[2] =  demiOctet[1];
-   ep[1] =  demiOctet[0];
-   ep[0] =  demiOctet[3];
-   return ep;
- }
+{
+  std::bitset<8> ep;
+  ep[7] =  demiOctet[0];
+  ep[6] =  demiOctet[3];
+  ep[5] =  demiOctet[2];
+  ep[4] =  demiOctet[1];
+  ep[3] =  demiOctet[2];
+  ep[2] =  demiOctet[1];
+  ep[1] =  demiOctet[0];
+  ep[0] =  demiOctet[3];
+  return ep;
+}
 
 std::bitset<4> traitement_matrices(std::bitset<8> resultatXOR)
 {
   std::bitset<4> sortieSbox;
 
- int ligneS0 = resultatXOR[7]*2 + resultatXOR[4];
- int colonneS0 = resultatXOR[6]*2 + resultatXOR[5];
- int ligneS1 = resultatXOR[3]*2 + resultatXOR[0];
- int colonneS1 = resultatXOR[2]*2 + resultatXOR[1];
- int valeurS0 = S0[colonneS0][ligneS0];
- int valeurS1 = S1[colonneS1][ligneS1];
+  int ligneS0 = resultatXOR[7]*2 + resultatXOR[4];
+  int colonneS0 = resultatXOR[6]*2 + resultatXOR[5];
+  int ligneS1 = resultatXOR[3]*2 + resultatXOR[0];
+  int colonneS1 = resultatXOR[2]*2 + resultatXOR[1];
+  int valeurS0 = S0[colonneS0][ligneS0];
+  int valeurS1 = S1[colonneS1][ligneS1];
 
- if( valeurS0 >= 2)
-   sortieSbox[3]=1;
- else  sortieSbox[3]=0;
- if(valeurS0 -2 > 0)
-   sortieSbox[2]=1;
+  if( valeurS0 >= 2)
+    sortieSbox[3]=1;
+  else  sortieSbox[3]=0;
+  if(valeurS0 -2 > 0)
+    sortieSbox[2]=1;
   else  sortieSbox[2]=0;
   if( valeurS1 >= 2)
-   sortieSbox[1]=1;
-   else  sortieSbox[1]=0;
- if(valeurS1 -2 > 0)
-   sortieSbox[0]=1;
+    sortieSbox[1]=1;
+  else  sortieSbox[1]=0;
+  if(valeurS1 -2 > 0)
+    sortieSbox[0]=1;
   else  sortieSbox[0]=0;
 
- return permutation_p4(sortieSbox);
+  return permutation_p4(sortieSbox);
 }
 
 void cryptage_tpdes(char caractere,  std::bitset<10> cle)
@@ -303,6 +303,21 @@ void cryptage_tpdes(char caractere,  std::bitset<10> cle)
 
   std::cout << "Resultat K1 : " << resultatFK1 << std::endl;
   std::cout << "Resultat K2 : " << resultatFK2 << std::endl;
+  // Resultat K1 correspond à la partie droite, et K2 à la partie gauche, ainsi:
+
+  std::bitset<8> resultatFinal;
+  resultatFinal[7] = resultatFK2[3];
+  resultatFinal[6] = resultatFK2[2];
+  resultatFinal[5] = resultatFK2[1];
+  resultatFinal[4] = resultatFK2[0];
+  resultatFinal[3] = resultatFK1[3];
+  resultatFinal[2] = resultatFK1[2];
+  resultatFinal[1] = resultatFK1[1];
+  resultatFinal[0] = resultatFK1[0];
+
+  resultatFinal =  permutation_ip_moinsun(resultatFinal);
+
+  std::cout << "Resultat du cryptage du caractere : " << resultatFinal; << std::endl;
 }
 
 int main(int argc, char ** argv)
@@ -319,24 +334,24 @@ int main(int argc, char ** argv)
       std::bitset<10> cle (argv[2]);
       
       if(fichier)  
-	    {       
-	      while(getline(fichier, maString))  // Chiffrement du texte ligne par ligne. 
+	{       
+	  while(getline(fichier, maString))  // Chiffrement du texte ligne par ligne. 
+	    {
+	      for(int i = 0; i < maString.size(); i++)
 		{
-		  for(int i = 0; i < maString.size(); i++)
+		  if((int)maString[i] >= 65 && (int)maString[i] <= 90 || (int)maString[i] >= 97 && (int)maString[i] <= 122 )
 		    {
-		      if((int)maString[i] >= 65 && (int)maString[i] <= 90 || (int)maString[i] >= 97 && (int)maString[i] <= 122 )
-			{
-			  cryptage_tpdes(maString[i], cle);
-			  // Stockage dans un autre fichier? 
-			}
-		
+		      cryptage_tpdes(maString[i], cle);
+		      // Stockage dans un autre fichier? 
 		    }
-		   
+		
 		}
-	      fichier.close(); 
+		   
 	    }
-	  else 
-	    std::cout << "Impossible d'ouvrir le fichier !" << std::endl;
+	  fichier.close(); 
+	}
+      else 
+	std::cout << "Impossible d'ouvrir le fichier !" << std::endl;
     }
   
   return 0;  
