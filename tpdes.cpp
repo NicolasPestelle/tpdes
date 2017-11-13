@@ -6,7 +6,7 @@
 
 // Actuellement, le code me retourne bien 1111 pour la première partie du codage de A
 // Cependant la valeur est faussée dans la deuxième partie
-// Toutes les fonctions sont cependant implementées pour que le tout fonctionne. 
+// Toutes les fonctions sont cependant implementées 
 
 
 int S0[4][4] = {{1,0,3,2},{3,2,1,0},{0,2,1,3},{3,1,3,2}};
@@ -318,6 +318,7 @@ void cryptage_tpdes(char caractere,  std::bitset<10> cle)
   resultatFinal =  permutation_ip_moinsun(resultatFinal);
 
   std::cout << "Resultat du cryptage du caractere : " << resultatFinal << std::endl;
+  std::cout << "Cela correspond au caractere : " <<  conversion_bit_to_char(resultatFinal) << std::endl;
 }
 
 int main(int argc, char ** argv)
