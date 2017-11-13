@@ -195,18 +195,18 @@ std::bitset<8> permutation_ip(std::bitset<8> octet)
   return  octetTempo;
 }
 
-// Fonction de permutation (IP-1)
+
 std::bitset<8> permutation_ip_moinsun(std::bitset<8> octet)
 {
   std::bitset<8> octetTempo;
-  octetTempo[0] =  octet[3];
-  octetTempo[1] =  octet[0];
-  octetTempo[2] =  octet[2];
-  octetTempo[3] =  octet[4];
-  octetTempo[4] =  octet[6];
-  octetTempo[5] =  octet[1];
+  octetTempo[7] =  octet[4];
   octetTempo[6] =  octet[7];
-  octetTempo[7] =  octet[5];
+  octetTempo[5] =  octet[5];
+  octetTempo[4] =  octet[3];
+  octetTempo[3] =  octet[1];
+  octetTempo[2] =  octet[6];
+  octetTempo[1] =  octet[0];
+  octetTempo[0] =  octet[2];
   return  octetTempo;
 }
 
@@ -279,6 +279,8 @@ std::bitset<4> traitement_matrices(std::bitset<8> resultatXOR)
 
 void cryptage_tpdes(char caractere,  std::bitset<10> cle)
 {
+
+  // Premiere itération, K1
   std::bitset<8> clek1 = generation_k1(cle);
   std::bitset<8> clek2 = generation_k2(cle);
   std::bitset<8> octet = conversion_char_to_bits(caractere);
@@ -288,15 +290,19 @@ void cryptage_tpdes(char caractere,  std::bitset<10> cle)
   std::bitset<8> resultatXOR = ep^=clek1;
   std::bitset<4> sortieSbox = traitement_matrices(resultatXOR);
   std::bitset<4> octetPartieGauche  = get_partie_gauche(octetIP);
-  std::bitset<4> resultatFK = fonction_fk(octetPartieGauche, sortieSbox);
+  std::bitset<4> resultatFK1 = fonction_fk(octetPartieGauche, sortieSbox);
 
+  // Deuxieme itération, K2
   octetIP = permutation_sw(octetIP);
   octetPartieDroite  = get_partie_droite(octetIP);
   ep = calcul_ep(octetPartieDroite);
   resultatXOR = ep^=clek2; 
   sortieSbox = traitement_matrices(resultatXOR);
   octetPartieGauche  = get_partie_gauche(octetIP);
-  resultatFK = fonction_fk(octetPartieGauche, sortieSbox);   
+  std::bitset<4> resultatFK2 = fonction_fk(octetPartieGauche, sortieSbox);
+
+  std::cout << "Resultat K1 : " << resultatFK1 << std::endl;
+  std::cout << "Resultat K2 : " << resultatFK2 << std::endl;
 }
 
 int main(int argc, char ** argv)
@@ -305,18 +311,27 @@ int main(int argc, char ** argv)
       
   if (argc < 3)
     {
-      std::cout << "Pas assez d'arguments, utilisez le format ./a.out <texte> <cle> <cle>" << std::endl;
+      std::cout << "Pas assez d'arguments, utilisez le format ./a.out <texte> <cle> " << std::endl;
     }
   else
     {
       std::ifstream fichier(argv[1], std::ios::in);
       std::bitset<10> cle (argv[2]);
+      
       if(fichier)  
 	    {       
 	      while(getline(fichier, maString))  // Chiffrement du texte ligne par ligne. 
 		{
 		  for(int i = 0; i < maString.size(); i++)
-		    cryptage_tpdes(maString[i], cle);
+		    {
+		      if((int)maString[i] >= 65 && (int)maString[i] <= 90 || (int)maString[i] >= 97 && (int)maString[i] <= 122 )
+			{
+			  cryptage_tpdes(maString[i], cle);
+			  // Stockage dans un autre fichier? 
+			}
+		
+		    }
+		   
 		}
 	      fichier.close(); 
 	    }
