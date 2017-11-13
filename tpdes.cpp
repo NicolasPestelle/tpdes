@@ -7,7 +7,8 @@
 // Actuellement, le code me retourne bien 1111 pour la première partie du codage de A
 // Cependant la valeur est faussée dans la deuxième partie
 // Toutes les fonctions sont cependant implementées 
-
+// On a voulu essayer d'utiliser les bitset, ce qui a par la suite provoqué plus de problemes que de solutions
+// ce qui explique notre code inachevé
 
 int S0[4][4] = {{1,0,3,2},{3,2,1,0},{0,2,1,3},{3,1,3,2}};
 int S1[4][4] = {{0,1,2,3},{2,0,1,3},{3,0,1,0},{2,1,0,3}};
